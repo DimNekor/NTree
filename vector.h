@@ -36,6 +36,22 @@ public:
    ~Vector();
 };
 
+template<>
+class Vector<char>
+{
+private:
+   int len;
+   char* pmas;
+public:
+   Vector();
+   void push(char);
+   void display();
+   int retLen();
+   char* retPmas();
+   int charMasToInt();
+   ~Vector();
+};
+
 template<typename T>
 Vector<T>::Vector()
 {
