@@ -113,3 +113,8 @@ int NTree::getNumOfChilds(Node* current)
 {
    return current->children.retLen();
 }
+
+Node* NTree::retCur()
+{
+   return current;
+}

@@ -65,5 +65,6 @@ void Vector<char>::display()
 Vector<char>::~Vector()
 {
    delete []pmas;
+   len = 0;
 }
 

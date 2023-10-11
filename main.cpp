@@ -1,6 +1,8 @@
 #include "N-Tree.h"
 #include <limits>
 
+void moveCursorInTree(NTree&, int, int);
+
 int main()
 {  
    bool isContinue = true;
@@ -56,8 +58,94 @@ int main()
             std::cout << "Do you want to fill it by keyboard? Press 'k'" << std::endl;
             std::cin >> choice;
             if (choice == 'f')
-            {
-                
+            {  
+               char filename[30];
+               std::cout << "Enter the name of file" << std::endl;
+               std::cin >> filename;
+               FILE* fp = fopen(filename, "r");
+               while (!fp)
+               {
+                  std::cout << "Incorrect name of file" << std::endl;
+                  std::cin >> filename;
+                  fp = fopen(filename, "r");
+               }
+               char ch;
+               int numOfLines = 0;
+               while( (ch = getc(fp)) != EOF)
+               {
+                  if (ch == '\n') numOfLines++;
+               }
+               fclose(fp);
+               FILE* file = fopen(filename, "r");
+               int numTransitionsDown = 0;
+               int numPositions = 0;
+               Vector<char> vecSym;
+               while( (ch = getc(file)) != EOF)
+               {
+                  if (numTransitionsDown < 2)
+                  {
+                     if (ch != ' ' &&  ch != '\n' && ch != '\r')
+                     {  
+                        vecSym.push(ch);
+                     } 
+                     else if (ch == ' ')
+                     {
+                        ntree.addEl(vecSym.charMasToInt());
+                        vecSym.~Vector();
+                     }
+                     else if (ch == '\n' && numTransitionsDown == numOfLines - 1)
+                     {
+                        ntree.addEl(vecSym.charMasToInt()); 
+                        numTransitionsDown++;
+                     }
+                     else if (ch == '\n')
+                     {
+                        ntree.addEl(vecSym.charMasToInt());
+                        numTransitionsDown++;
+                        vecSym.~Vector();
+                     }
+                  }
+                  else 
+                  {
+                     if (ch != ' ' && ch != '\n' && ch != '\r' && ch != '|')
+                     {
+                        std::cout << ch << std::endl;
+                        vecSym.push(ch);
+                     }
+                     else if (ch == '|')
+                     {  
+                        int temp = numPositions;
+                        moveCursorInTree(ntree, numPositions, numTransitionsDown);
+                        numPositions = temp;
+                        numPositions++;
+                        ntree.addEl(vecSym.charMasToInt());
+                        vecSym.~Vector();
+                     }
+                     else if (ch == ' ')
+                     {
+                        int temp = numPositions;
+                        moveCursorInTree(ntree, numPositions, numTransitionsDown);
+                        numPositions = temp;
+                        ntree.addEl(vecSym.charMasToInt());
+                        vecSym.~Vector();
+                     }
+                     else if (ch == '\n' && numTransitionsDown == numOfLines -  1)
+                     {
+                        moveCursorInTree(ntree, numPositions, numTransitionsDown);
+                        ntree.addEl(vecSym.charMasToInt());
+                     } 
+                     else if (ch == '\n')
+                     {  
+                        moveCursorInTree(ntree, numPositions, numTransitionsDown);
+                        ntree.addEl(vecSym.charMasToInt());
+                        numTransitionsDown++;
+                        numPositions++;
+                        vecSym.~Vector();
+                     }
+                  }   
+               }
+               fclose(file);
+               choice = 's';          
             }
             else if (choice == 'k')
             {  
@@ -162,7 +250,7 @@ int main()
                         }
                         else
                         {
-                           std::cout << "((((Incorrect input!" << std::endl;
+                           std::cout << "Incorrect input!" << std::endl;
                         }
                      }
                   }
@@ -170,7 +258,7 @@ int main()
             }
             else
             {
-               std::cout << "Incorrect input!!!" << std::endl;
+               std::cout << "Incorrect input!" << std::endl;
                choice = 's';
             }
          }   
@@ -186,4 +274,28 @@ int main()
       }
    }         
    return 0;
+}
+
+void moveCursorInTree(NTree& ntree, int numPositions, int numTransitionsDown)
+{  
+   ntree.currentEqualRoot();
+   for (int i = 0; i < numTransitionsDown - 1; i++)
+   {
+      int lastChildren = 0;
+      if (ntree.getNumOfChilds() <= numPositions)
+      {
+         int temp = ntree.getNumOfChilds();
+         if (lastChildren != ntree.getNumOfChilds())
+         {
+            lastChildren = ntree.getNumOfChilds();
+         }
+         ntree.moveToNode(numPositions/ntree.getNumOfChilds() % temp);
+         numPositions = numPositions - temp;
+         lastChildren = ntree.getNumOfChilds();
+       }
+      else
+      {
+         ntree.moveToNode(numPositions + 1);
+      }
+   }  
 }

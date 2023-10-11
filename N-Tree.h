@@ -26,5 +26,6 @@ public:
    int retHeight();
    void initializeHeight();
    int  getNumOfChilds();
+   Node* retCur();
    void display();
 };
